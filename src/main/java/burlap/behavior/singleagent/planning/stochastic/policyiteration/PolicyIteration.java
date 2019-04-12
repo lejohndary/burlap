@@ -71,6 +71,7 @@ public class PolicyIteration extends DynamicProgramming implements Planner {
 	 */
 	protected boolean												hasRunPlanning = false;
 	
+	private double 													latestDelta = Double.MAX_VALUE;
 	
 	/**
 	 * Initializes the valueFunction.
@@ -175,6 +176,7 @@ public class PolicyIteration extends DynamicProgramming implements Planner {
 				delta = this.evaluatePolicy();
 				iterations++;
 				this.evaluativePolicy = new GreedyQPolicy(this.getCopyOfValueFunction());
+				latestDelta = delta;
 			}while(delta > this.maxPIDelta && iterations < maxPolicyIterations);
 
 			this.hasRunPlanning = true;
@@ -186,6 +188,11 @@ public class PolicyIteration extends DynamicProgramming implements Planner {
 
 		return (GreedyQPolicy)this.evaluativePolicy;
 
+	}
+	
+	@Override
+	public double getLatestDelta(){
+		return latestDelta;
 	}
 	
 	

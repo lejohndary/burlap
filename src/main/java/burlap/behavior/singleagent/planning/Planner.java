@@ -8,6 +8,10 @@ import burlap.mdp.core.state.State;
  * @author James MacGlashan.
  */
 public interface Planner extends MDPSolverInterface{
+	
+	default double getLatestDelta(){
+		return Double.NaN;
+	}
 
 	/**
 	 * This method will cause the {@link burlap.behavior.singleagent.planning.Planner} to begin planning from the specified initial {@link State}.

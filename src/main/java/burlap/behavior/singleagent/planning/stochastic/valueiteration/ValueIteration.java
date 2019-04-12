@@ -62,6 +62,7 @@ public class ValueIteration extends DynamicProgramming implements Planner {
 	
 	protected boolean												hasRunVI = false;
 	
+	private double 													latestDelta = Double.MAX_VALUE;
 	
 	/**
 	 * Initializers the valueFunction.
@@ -114,6 +115,15 @@ public class ValueIteration extends DynamicProgramming implements Planner {
 		return new GreedyQPolicy(this);
 	}
 	
+	/**
+	 * Gets the latest delta
+	 * @return double delta
+	 */
+	@Override
+	public double getLatestDelta(){
+		return latestDelta;
+	}
+	
 	@Override
 	public void resetSolver(){
 		super.resetSolver();
@@ -146,6 +156,8 @@ public class ValueIteration extends DynamicProgramming implements Planner {
 				delta = Math.max(Math.abs(maxQ - v), delta);
 				
 			}
+			
+			latestDelta = delta;
 			
 			if(delta < this.maxDelta){
 				break; //approximated well enough; stop iterating
