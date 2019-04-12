@@ -117,6 +117,8 @@ public class QLearning extends MDPSolver implements QProvider, LearningAgent, Pl
 	 */
 	protected int													totalNumberOfSteps = 0;
 	
+	private double													latestDelta = Double.MAX_VALUE;
+	
 	
 	/**
 	 * Initializes Q-learning with 0.1 epsilon greedy policy, the same Q-value initialization everywhere, and places no limit on the number of steps the 
@@ -132,6 +134,23 @@ public class QLearning extends MDPSolver implements QProvider, LearningAgent, Pl
 	public QLearning(SADomain domain, double gamma, HashableStateFactory hashingFactory,
 			double qInit, double learningRate) {
 		this.QLInit(domain, gamma, hashingFactory, new ConstantValueFunction(qInit), learningRate, new EpsilonGreedy(this, 0.1), Integer.MAX_VALUE);
+	}
+	
+	/**
+	 * Initializes Q-learning with 0.1 epsilon greedy policy, the same Q-value initialization everywhere, and places no limit on the number of steps the 
+	 * agent can take in an episode. By default the agent will only save the last learning episode and a call to the {@link #planFromState(State)} method
+	 * will cause the valueFunction to use only one episode for planning; this should probably be changed to a much larger value if you plan on using this
+	 * algorithm as a planning algorithm.
+	 * @param domain the domain in which to learn
+	 * @param gamma the discount factor
+	 * @param hashingFactory the state hashing factory to use for Q-lookups
+	 * @param qInit the initial Q-value to user everywhere
+	 * @param learningRate the learning rate
+	 * @param epsilon the epsilon for epsilon greedy
+	 */
+	public QLearning(SADomain domain, double gamma, HashableStateFactory hashingFactory,
+			double qInit, double learningRate, double epsilon) {
+		this.QLInit(domain, gamma, hashingFactory, new ConstantValueFunction(qInit), learningRate, new EpsilonGreedy(this, epsilon), Integer.MAX_VALUE);
 	}
 
 
@@ -415,11 +434,17 @@ public class QLearning extends MDPSolver implements QProvider, LearningAgent, Pl
 		do{
 			this.runLearningEpisode(env, this.maxEpisodeSize);
 			eCount++;
+			latestDelta = maxQChangeInLastEpisode;
 		}while(eCount < numEpisodesForPlanning && maxQChangeInLastEpisode > maxQChangeForPlanningTermination);
 
 
 		return new GreedyQPolicy(this);
 
+	}
+	
+	@Override
+	public double getLatestDelta(){
+		return latestDelta;
 	}
 
 	@Override
